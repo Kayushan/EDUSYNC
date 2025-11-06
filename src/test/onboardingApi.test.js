@@ -76,9 +76,10 @@ describe('Onboarding API', () => {
 
   describe('updateUserProfile', () => {
     it('updates user profile successfully', async () => {
+      const validSchoolId = '12345678-1234-5678-8abc-123456789abc';
       const mockProfile = {
         id: 'user-123',
-        school_id: 'school-123',
+        school_id: validSchoolId,
         role: 'principal',
         full_name: 'John Doe',
       };
@@ -93,7 +94,7 @@ describe('Onboarding API', () => {
 
       const result = await updateUserProfile(
         'user-123',
-        'school-123',
+        validSchoolId,
         'principal',
         'John Doe'
       );
@@ -106,7 +107,7 @@ describe('Onboarding API', () => {
     it('validates school ID format', async () => {
       const result = await updateUserProfile(
         'user-123',
-        'invalid-id',
+        'not-a-valid-uuid',
         'principal',
         'John Doe'
       );
@@ -117,7 +118,7 @@ describe('Onboarding API', () => {
   });
 
   describe('uploadSchoolLogo', () => {
-    const validSchoolId = '12345678-1234-1234-1234-123456789abc';
+    const validSchoolId = '12345678-1234-5678-8abc-123456789abc';
 
     it('uploads logo successfully', async () => {
       const mockFile = new File(['logo'], 'logo.png', { type: 'image/png' });
@@ -162,7 +163,7 @@ describe('Onboarding API', () => {
   });
 
   describe('sendTeacherInvitations', () => {
-    const validSchoolId = '12345678-1234-1234-1234-123456789abc';
+    const validSchoolId = '12345678-1234-5678-8abc-123456789abc';
 
     it('handles teacher invitations', async () => {
       const emails = ['teacher1@test.com', 'teacher2@test.com'];
@@ -188,7 +189,7 @@ describe('Onboarding API', () => {
 
   describe('completeOnboarding', () => {
     it('completes full onboarding process', async () => {
-      const validSchoolId = '12345678-1234-1234-1234-123456789abc';
+      const validSchoolId = '12345678-1234-5678-8abc-123456789abc';
       const mockSchool = {
         id: validSchoolId,
         name: 'Test School',
