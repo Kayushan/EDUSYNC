@@ -22,8 +22,10 @@ export default function Register() {
     clearError();
     const result = await signUp(data);
     if (result.success) {
-      alert(result.message);
-      navigate('/login');
+      // For now, all new registrations are principals and should complete onboarding
+      // In a real app, you'd handle different registration flows for different roles
+      alert(result.message + ' Please check your email to verify your account, then proceed to onboarding.');
+      navigate('/onboarding');
     }
   };
 

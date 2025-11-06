@@ -101,3 +101,39 @@ export const sanitizeQuery = (query, userRole, schoolId) => {
   
   return query;
 };
+
+// Onboarding validation schemas
+export const schoolNameSchema = z.object({
+  schoolName: z.string()
+    .min(3, 'School name must be at least 3 characters')
+    .max(100, 'School name must not exceed 100 characters')
+    .trim(),
+});
+
+export const schoolAddressSchema = z.object({
+  schoolAddress: z.string()
+    .max(200, 'Address must not exceed 200 characters')
+    .optional()
+    .or(z.literal('')),
+});
+
+export const unhcrStatusSchema = z.object({
+  unhcrStatus: z.boolean(),
+});
+
+export const principalInfoSchema = z.object({
+  principalName: z.string()
+    .min(2, 'Name must be at least 2 characters')
+    .max(100, 'Name must not exceed 100 characters')
+    .trim(),
+  principalPhone: z.string()
+    .regex(/^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,9}$/, 'Please enter a valid phone number')
+    .optional()
+    .or(z.literal('')),
+});
+
+export const teacherEmailsSchema = z.object({
+  teacherEmails: z.array(
+    z.string().email('Please enter valid email addresses')
+  ).optional(),
+});

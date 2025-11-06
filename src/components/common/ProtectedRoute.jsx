@@ -1,5 +1,7 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { useEffect, useState } from 'react';
+import { checkOnboardingStatus } from '../../api/onboarding';
 import { motion } from 'framer-motion';
 import Spinner from './Spinner';
 
@@ -11,9 +13,28 @@ const ProtectedRoute = ({
 }) => {
   const { isAuthenticated, loading, authLoading, user } = useAuth();
   const location = useLocation();
+  const [checkingOnboarding, setCheckingOnboarding] = useState(true);
+  const [needsOnboarding, setNeedsOnboarding] = useState(false);
 
-  // Show loading spinner while checking authentication
-  if (loading || authLoading) {
+  // Check onboarding status when user is authenticated
+  useEffect(() => {
+    const checkOnboarding = async () => {
+      if (isAuthenticated && user) {
+        const result = await checkOnboardingStatus(user.id);
+        setNeedsOnboarding(!result.hasCompletedOnboarding);
+        setCheckingOnboarding(false);
+      } else {
+        setCheckingOnboarding(false);
+      }
+    };
+
+    if (!loading && !authLoading) {
+      checkOnboarding();
+    }
+  }, [isAuthenticated, user, loading, authLoading]);
+
+  // Show loading spinner while checking authentication or onboarding
+  if (loading || authLoading || checkingOnboarding) {
     return loadingComponent || (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
         <motion.div
@@ -30,6 +51,11 @@ const ProtectedRoute = ({
   // If not authenticated, redirect to login with return URL
   if (!isAuthenticated) {
     return <Navigate to={redirectTo} state={{ from: location }} replace />;
+  }
+
+  // If user needs onboarding and not already on onboarding page, redirect
+  if (needsOnboarding && location.pathname !== '/onboarding') {
+    return <Navigate to="/onboarding" replace />;
   }
 
   // If role is required, check user role

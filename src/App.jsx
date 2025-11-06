@@ -50,9 +50,11 @@ function App() {
             </PublicLayout>
           } />
           <Route path="/onboarding" element={
-            <PublicLayout>
-              <Onboarding />
-            </PublicLayout>
+            <ProtectedRoute>
+              <PublicLayout>
+                <Onboarding />
+              </PublicLayout>
+            </ProtectedRoute>
           } />
           
           {/* Protected Routes */}
