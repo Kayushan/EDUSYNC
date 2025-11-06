@@ -139,8 +139,11 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
+    // Always render children so hooks using the AuthContext (including in tests)
+    // can access the context values. Components can rely on the `loading`
+    // and `authLoading` flags to decide what to show in the UI.
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   );
 };
