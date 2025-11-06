@@ -3,6 +3,8 @@ const colorMap = {
   approved: 'bg-green-500 text-white',
   rejected: 'bg-red-500 text-white',
   info: 'bg-blue-500 text-white',
+  success: 'bg-green-500 text-white',
+  default: 'bg-gray-500 text-white',
 };
 
 const Badge = ({ children, variant = 'info', className = '' }) => {
