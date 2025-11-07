@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import React from 'react';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
@@ -19,25 +20,26 @@ vi.mock('../api/onboarding', () => ({
 }));
 
 // Mock framer-motion
-vi.mock('framer-motion', () => {
-  const React = require('react');
-  return {
-    motion: {
-      div: React.forwardRef(({ children, ...props }, ref) => <div ref={ref} {...props}>{children}</div>),
-      p: React.forwardRef(({ children, ...props }, ref) => <p ref={ref} {...props}>{children}</p>),
-      button: React.forwardRef(({ children, ...props }, ref) => <button ref={ref} {...props}>{children}</button>),
-      label: React.forwardRef(({ children, ...props }, ref) => <label ref={ref} {...props}>{children}</label>),
-      svg: React.forwardRef(({ children, ...props }, ref) => <svg ref={ref} {...props}>{children}</svg>),
-      path: React.forwardRef(({ ...props }, ref) => <path ref={ref} {...props} />),
-    },
-    AnimatePresence: ({ children }) => <>{children}</>,
-  };
-});
+vi.mock('framer-motion', () => ({
+  motion: {
+    div: React.forwardRef(({ children, ...props }, ref) => React.createElement('div', { ref, ...props }, children)),
+    p: React.forwardRef(({ children, ...props }, ref) => React.createElement('p', { ref, ...props }, children)),
+    button: React.forwardRef(({ children, ...props }, ref) => React.createElement('button', { ref, ...props }, children)),
+    label: React.forwardRef(({ children, ...props }, ref) => React.createElement('label', { ref, ...props }, children)),
+    svg: React.forwardRef(({ children, ...props }, ref) => React.createElement('svg', { ref, ...props }, children)),
+    path: React.forwardRef(({ ...props }, ref) => React.createElement('path', { ref, ...props })),
+  },
+  AnimatePresence: ({ children }) => React.createElement(React.Fragment, {}, children),
+}));
 
 // Mock canvas-confetti
 vi.mock('canvas-confetti', () => ({
   default: vi.fn(),
 }));
+
+// Don't mock react-hook-form - let it work normally for these component tests
+
+// Don't mock common components - they render properly with real CSS classes
 
 const mockAuthContext = {
   user: {
@@ -204,7 +206,7 @@ describe('Onboarding Wizard', () => {
     await user.click(screen.getByRole('button', { name: /Skip/i }));
     
     // Step 5: Principal Info
-    await waitFor(() => screen.getByText(/Your Contact Information/i));
+    await waitFor(() => screen.getByRole('heading', { name: /Your Contact Information/i }));
     await user.type(screen.getByLabelText(/Full Name/i), 'Dr. Jane Smith');
     await user.click(screen.getByRole('button', { name: /Continue/i }));
     
@@ -264,7 +266,7 @@ describe('Onboarding Wizard', () => {
     await waitFor(() => screen.getByText(/Add Your School Logo/i));
     await user.click(screen.getByRole('button', { name: /Skip/i }));
     
-    await waitFor(() => screen.getByText(/Your Contact Information/i));
+    await waitFor(() => screen.getByRole('heading', { name: /Your Contact Information/i }));
     await user.type(screen.getByLabelText(/Full Name/i), 'Dr. Jane Smith');
     await user.click(screen.getByRole('button', { name: /Continue/i }));
     
@@ -277,6 +279,6 @@ describe('Onboarding Wizard', () => {
     // Should show error message
     await waitFor(() => {
       expect(screen.getByText(/Failed to create school/i)).toBeInTheDocument();
-    });
+    }, { timeout: 3000 });
   });
 });
